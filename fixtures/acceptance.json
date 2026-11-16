@@ -1,0 +1,54 @@
+{
+  "context": {
+    "bookings": [],
+    "completed_courses": [
+      "basic"
+    ],
+    "capacity": 20,
+    "travel_matrix": {
+      "school": {
+        "job": 20
+      },
+      "job": {
+        "school": 20
+      }
+    }
+  },
+  "items": [
+    {
+      "id": "plan-1",
+      "owner_id": "person-1",
+      "start": "2026-11-16T09:00:00+00:00",
+      "end": "2026-11-16T11:00:00+00:00",
+      "travel_minutes": 20,
+      "minimum_rest_minutes": 30,
+      "prerequisites": [
+        "basic"
+      ],
+      "demand": 1,
+      "amount": "0",
+      "effective_from": "2026-11-16",
+      "request_key": "acceptance-1",
+      "activities": [
+        {
+          "id": "course",
+          "kind": "training",
+          "start": "2026-11-16T09:00:00+00:00",
+          "end": "2026-11-16T10:00:00+00:00",
+          "location": "school",
+          "prerequisites": [
+            "basic"
+          ]
+        },
+        {
+          "id": "shift",
+          "kind": "gig",
+          "start": "2026-11-16T11:00:00+00:00",
+          "end": "2026-11-16T13:00:00+00:00",
+          "location": "job",
+          "priority": 2
+        }
+      ]
+    }
+  ]
+}
