@@ -1,5 +1,6 @@
 from __future__ import annotations
 from ..route_planning.itinerary import ItineraryPlanner
+from ..route_planning.change_impact import ChangeImpactAnalyzer
 import datetime as dt
 import decimal
 import math
@@ -51,10 +52,21 @@ class ScheduleEngineBase:
         return {'changes':changes,'change_count':len(changes)}
 
 class ScheduleEngine(ScheduleEngineBase):
-    def __init__(self): self.itinerary=ItineraryPlanner()
+    def __init__(self):
+        self.itinerary = ItineraryPlanner()
+        self.change_impact_analyzer = ChangeImpactAnalyzer(self.itinerary)
     def evaluate(self,item,context):
         if item.get('activities'):
-            facts=self.itinerary.plan(item['activities'],context); accepted=not facts['rejected']; return AnalysisResult(str(item.get('id','unknown')),accepted,decimal.Decimal(len(facts['chosen'])),tuple(reason for row in facts['rejected'] for reason in row['reasons']),facts)
+            plan=self.itinerary.plan(item['activities'],context)
+            facts=dict(plan)
+            if item.get('schedule_changes'):
+                facts['change_impact']=self.change_impact_analyzer.analyze(
+                    item['activities'],item['schedule_changes'],context)
+            accepted=not plan['rejected']
+            return AnalysisResult(
+                str(item.get('id','unknown')),accepted,
+                decimal.Decimal(len(plan['chosen'])),
+                tuple(reason for row in plan['rejected'] for reason in row['reasons']),facts)
         key=str(item.get('id','unknown'));start=dt.datetime.fromisoformat(str(item.get('start','2026-11-16T09:00:00+00:00')));end=dt.datetime.fromisoformat(str(item.get('end','2026-11-16T10:00:00+00:00')));reasons=[]
         if end<=start:reasons.append('invalid_interval')
         travel=int(item.get('travel_minutes',0));rest=int(item.get('minimum_rest_minutes',0))
